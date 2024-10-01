@@ -5,6 +5,7 @@ const outputFile = "statistics.csv";
 const delimiter = ",";
 
 const passwordLengths = {};
+const passwordStartsWith = {};
 
 
 function deleteExistingOutputFile() {
@@ -19,18 +20,27 @@ function processData() {
 
   for(const line of lines) {  
     const element = line.split(delimiter); 
-    const key = element[1].length;
+    const keyNum = element[1].length;
 
-    if(passwordLengths[key]) {
-      passwordLengths[key]++;
-    } else {
-      passwordLengths[key] = 1;
-    }
+    passwordLengths[keyNum] ? passwordLengths[keyNum]++ : passwordLengths[keyNum] = 1;
   }
-  console.log(passwordLengths);
 
-  Object.keys(passwordLengths).forEach(key => {
+  for(const line of lines) {
+    const element = line.split(delimiter);
+    const keyLet = element[1][0];
+
+    passwordStartsWith[keyLet] ? passwordStartsWith[keyLet]++ : passwordStartsWith[keyLet] = 1;
+  }
+  fs.appendFileSync(outputFile, `\nPassword Lengths: \n`);
+  Object.keys(passwordLengths,passwordStartsWith).forEach(key => {
     fs.appendFileSync(outputFile, `Chars: ${key}  Count:${passwordLengths[key]}\n`);
+    fs.appendFileSync(outputFile, `Chars: ${key}  Count:${passwordStartsWith[key]}\n`);
+  });
+
+  fs.appendFileSync(outputFile, `\nStarts With: \n`);
+
+  Object.keys(passwordStartsWith).forEach(key => {
+    fs.appendFileSync(outputFile, `Chars: ${key}  Count:${passwordStartsWith[key]}\n`);
   });
 }
 
